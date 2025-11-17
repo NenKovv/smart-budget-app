@@ -10,6 +10,7 @@ import { rateLimiter } from './middleware/rateLimiter';
 import authRoutes from './routes/authRoutes';
 import transactionRoutes from './routes/transactionRoutes';
 import budgetRoutes from './routes/budgetRoutes';
+import dashboardRoutes from './routes/dashboardRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,7 @@ app.use(rateLimiter); // Rate limiting
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/budgets', budgetRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
