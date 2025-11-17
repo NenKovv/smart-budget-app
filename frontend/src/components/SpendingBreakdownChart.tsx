@@ -93,7 +93,7 @@ const SpendingBreakdownChart: React.FC<SpendingBreakdownChartProps> = ({ data })
                 <Typography variant="body2">{item.category}</Typography>
               </Box>
               <Typography variant="body2" fontWeight="bold">
-                €{item.total.toFixed(2)} ({item.percentage.toFixed(1)}%)
+                €{Number(item.total).toFixed(2)} ({Number(item.percentage).toFixed(1)}%)
               </Typography>
             </Box>
           ))}

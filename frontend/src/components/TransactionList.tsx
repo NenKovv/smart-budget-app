@@ -41,7 +41,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
   const formatAmount = (amount: number, category: string): string => {
     const prefix = ['Income', 'Salary'].includes(category) ? '+' : '-';
-    return `${prefix}€${amount.toFixed(2)}`;
+    return `${prefix}€${Number(amount).toFixed(2)}`;
   };
 
   if (transactions.length === 0) {

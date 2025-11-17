@@ -32,7 +32,7 @@ const DashboardSummaryCard: React.FC<DashboardSummaryCardProps> = ({
               </Typography>
             </Box>
             <Typography variant="h5" color="success.main" fontWeight="bold">
-              €{totalIncome.toFixed(2)}
+              €{Number(totalIncome).toFixed(2)}
             </Typography>
           </Grid>
 
@@ -45,7 +45,7 @@ const DashboardSummaryCard: React.FC<DashboardSummaryCardProps> = ({
               </Typography>
             </Box>
             <Typography variant="h5" color="error.main" fontWeight="bold">
-              €{totalExpenses.toFixed(2)}
+              €{Number(totalExpenses).toFixed(2)}
             </Typography>
           </Grid>
 
@@ -62,7 +62,7 @@ const DashboardSummaryCard: React.FC<DashboardSummaryCardProps> = ({
               color={netBalance >= 0 ? 'success.main' : 'error.main'}
               fontWeight="bold"
             >
-              €{netBalance.toFixed(2)}
+              €{Number(netBalance).toFixed(2)}
             </Typography>
           </Grid>
         </Grid>
