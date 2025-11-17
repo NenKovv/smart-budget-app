@@ -1,0 +1,43 @@
+name: Deploy to Staging (Heroku)
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    name: Deploy to Heroku Staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.13.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: smartbudget-staging
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          buildpack: heroku/nodejs
+          appdir: backend
+
+      - name: Run database migrations
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku run "cd migrations && for file in *.sql; do psql \$DATABASE_URL -f \"\$file\"; done" -a smartbudget-staging
+
+      - name: Verify deployment
+        run: |
+          sleep 10
+          curl --fail https://smartbudget-staging.herokuapp.com/health || exit 1
+
+      - name: Notify deployment success
+        if: success()
+        run: echo "✅ Deployment to staging successful!"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: echo "❌ Deployment to staging failed!"

@@ -1,0 +1,67 @@
+name: Deploy to Production (Heroku)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # Run tests before deploying to production
+  run-tests:
+    name: Run All Tests
+    uses: ./.github/workflows/ci.yml
+
+  deploy-production:
+    name: Deploy to Heroku Production
+    runs-on: ubuntu-latest
+    needs: run-tests
+    environment:
+      name: production
+      url: https://smartbudget.herokuapp.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.13.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: smartbudget-production
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          buildpack: heroku/nodejs
+          appdir: backend
+
+      - name: Run database migrations
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku run "cd migrations && for file in *.sql; do psql \$DATABASE_URL -f \"\$file\"; done" -a smartbudget-production
+
+      - name: Verify deployment
+        run: |
+          sleep 15
+          curl --fail https://smartbudget-production.herokuapp.com/health || exit 1
+
+      - name: Create GitHub Release
+        if: success()
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+          body: |
+            Automated production deployment
+            - Build: ${{ github.run_number }}
+            - Commit: ${{ github.sha }}
+          draft: false
+          prerelease: false
+
+      - name: Notify deployment success
+        if: success()
+        run: echo "✅ Production deployment successful!"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: echo "❌ Production deployment failed! Rollback may be required."
