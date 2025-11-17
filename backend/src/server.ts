@@ -34,7 +34,7 @@ app.use('/api/budgets', budgetRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
